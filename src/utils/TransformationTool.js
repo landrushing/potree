@@ -30,7 +30,7 @@ export class TransformationTool {
 		let red = 0xE73100;
 		let green = 0x44A24A;
 		let blue = 0x2669E7;
-		
+
 		this.activeHandle = null;
 		this.scaleHandles = {
 			"scale.x+": {name: "scale.x+", node: new THREE.Object3D(), color: red, alignment: [+1, +0, +0]},
@@ -40,31 +40,16 @@ export class TransformationTool {
 			"scale.z+": {name: "scale.z+", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, +1]},
 			"scale.z-": {name: "scale.z-", node: new THREE.Object3D(), color: blue, alignment: [+0, +0, -1]},
 		};
-		this.focusHandles = {
-			"focus.x+": {name: "focus.x+", node:  new THREE.Object3D(), color: red, alignment: [+1, +0, +0]},
-			"focus.x-": {name: "focus.x-", node:  new THREE.Object3D(), color: red, alignment: [-1, +0, +0]},
-			"focus.y+": {name: "focus.y+", node:  new THREE.Object3D(), color: green, alignment: [+0, +1, +0]},
-			"focus.y-": {name: "focus.y-", node:  new THREE.Object3D(), color: green, alignment: [+0, -1, +0]},
-			"focus.z+": {name: "focus.z+", node:  new THREE.Object3D(), color: blue, alignment: [+0, +0, +1]},
-			"focus.z-": {name: "focus.z-", node:  new THREE.Object3D(), color: blue, alignment: [+0, +0, -1]},
-		};
 		this.translationHandles = {
 			"translation.x": {name: "translation.x", node:  new THREE.Object3D(), color: red, alignment: [1, 0, 0]},
 			"translation.y": {name: "translation.y", node:  new THREE.Object3D(), color: green, alignment: [0, 1, 0]},
 			"translation.z": {name: "translation.z", node:  new THREE.Object3D(), color: blue, alignment: [0, 0, 1]},
 		};
-		this.rotationHandles = {
-			"rotation.x": {name: "rotation.x", node:  new THREE.Object3D(), color: red, alignment: [1, 0, 0]},
-			"rotation.y": {name: "rotation.y", node:  new THREE.Object3D(), color: green, alignment: [0, 1, 0]},
-			"rotation.z": {name: "rotation.z", node:  new THREE.Object3D(), color: blue, alignment: [0, 0, 1]},
-		};
-		this.handles = Object.assign({}, this.scaleHandles, this.focusHandles, this.translationHandles, this.rotationHandles);
+		this.handles = Object.assign({}, this.scaleHandles, this.translationHandles);
 		this.pickVolumes = [];
 
 		this.initializeScaleHandles();
-		this.initializeFocusHandles();
 		this.initializeTranslationHandles();
-		this.initializeRotationHandles();
 
 
 		let boxFrameGeometry = new THREE.Geometry();
@@ -100,7 +85,7 @@ export class TransformationTool {
 		this.frame = new THREE.LineSegments(boxFrameGeometry, new THREE.LineBasicMaterial({color: 0xffff00}));
 		this.scene.add(this.frame);
 
-		
+
 	}
 
 	initializeScaleHandles(){
@@ -120,7 +105,7 @@ export class TransformationTool {
 				});
 
 			let outlineMaterial = new THREE.MeshBasicMaterial({
-				color: 0x000000, 
+				color: 0x000000,
 				side: THREE.BackSide,
 				opacity: 0.4,
 				transparent: true});
@@ -134,7 +119,7 @@ export class TransformationTool {
 			sphere.scale.set(1.3, 1.3, 1.3);
 			sphere.name = `${handleName}.handle`;
 			node.add(sphere);
-			
+
 			let outline = new THREE.Mesh(sgSphere, outlineMaterial);
 			outline.scale.set(1.4, 1.4, 1.4);
 			outline.name = `${handleName}.outline`;
@@ -177,127 +162,6 @@ export class TransformationTool {
 		}
 	}
 
-	initializeFocusHandles(){
-		//let sgBox = new THREE.BoxGeometry(1, 1, 1);
-		let sgPlane = new THREE.PlaneGeometry(4, 4, 1, 1);
-		let sgLowPolySphere = new THREE.SphereGeometry(1, 16, 16);
-
-		let texture = new THREE.TextureLoader().load(`${exports.resourcePath}/icons/eye_2.png`);
-
-		for(let handleName of Object.keys(this.focusHandles)){
-			let handle = this.focusHandles[handleName];
-			let node = handle.node;
-			this.scene.add(node);
-			let align = handle.alignment;
-
-			//node.lookAt(new THREE.Vector3().addVectors(node.position, new THREE.Vector3(...align)));
-			node.lookAt(new THREE.Vector3(...align));
-
-			let off = 0.8;
-			if(align[0] === 1){
-				node.position.set(1, off, -off).multiplyScalar(0.5);
-				node.rotation.z = Math.PI / 2;
-			}else if(align[0] === -1){
-				node.position.set(-1, -off, -off).multiplyScalar(0.5);
-				node.rotation.z = Math.PI / 2;
-			}else if(align[1] === 1){
-				node.position.set(-off, 1, -off).multiplyScalar(0.5);
-				node.rotation.set(Math.PI / 2, Math.PI, 0.0);
-			}else if(align[1] === -1){
-				node.position.set(off, -1, -off).multiplyScalar(0.5);
-				node.rotation.set(Math.PI / 2, 0.0, 0.0);
-			}else if(align[2] === 1){
-				node.position.set(off, off, 1).multiplyScalar(0.5);
-			}else if(align[2] === -1){
-				node.position.set(-off, off, -1).multiplyScalar(0.5);
-			}
-
-			let material = new THREE.MeshBasicMaterial({
-				color: handle.color,
-				opacity: 0,
-				transparent: true,
-				map: texture
-			});
-
-			//let outlineMaterial = new THREE.MeshBasicMaterial({
-			//	color: 0x000000, 
-			//	side: THREE.BackSide,
-			//	opacity: 0,
-			//	transparent: true});
-
-			let pickMaterial = new THREE.MeshNormalMaterial({
-				//opacity: 0,
-				transparent: true,
-				visible: this.showPickVolumes});
-
-			let box = new THREE.Mesh(sgPlane, material);
-			box.name = `${handleName}.handle`;
-			box.scale.set(1.5, 1.5, 1.5);
-			box.position.set(0, 0, 0);
-			box.visible = false;
-			node.add(box);
-			//handle.focusNode = box;
-			
-			//let outline = new THREE.Mesh(sgPlane, outlineMaterial);
-			//outline.scale.set(1.4, 1.4, 1.4);
-			//outline.name = `${handleName}.outline`;
-			//box.add(outline);
-
-			let pickSphere = new THREE.Mesh(sgLowPolySphere, pickMaterial);
-			pickSphere.name = `${handleName}.pick_volume`;
-			pickSphere.scale.set(3, 3, 3);
-			box.add(pickSphere);
-			pickSphere.handle = handleName;
-			this.pickVolumes.push(pickSphere);
-
-			node.setOpacity = (target) => {
-				let opacity = {x: material.opacity};
-				let t = new TWEEN.Tween(opacity).to({x: target}, 100);
-				t.onUpdate(() => {
-					pickSphere.visible = opacity.x > 0;
-					box.visible = opacity.x > 0;
-					material.opacity = opacity.x;
-					//outlineMaterial.opacity = opacity.x;
-					pickSphere.material.opacity = opacity.x * 0.5;
-				});
-				t.start();
-			};
-
-			pickSphere.addEventListener("drag", e => {});
-
-			pickSphere.addEventListener("mouseup", e => {
-				e.consume();
-			});
-
-			pickSphere.addEventListener("mousedown", e => {
-				e.consume();
-			});
-
-			pickSphere.addEventListener("click", e => {
-				e.consume();
-
-				let selected = this.selection[0];
-				let maxScale = Math.max(...selected.scale.toArray());
-				let minScale = Math.min(...selected.scale.toArray());
-				let handleLength = Math.abs(selected.scale.dot(new THREE.Vector3(...handle.alignment)));
-				let alignment = new THREE.Vector3(...handle.alignment).multiplyScalar(2 * maxScale / handleLength);
-				alignment.applyMatrix4(selected.matrixWorld);
-				let newCamPos = alignment;
-				let newCamTarget = selected.getWorldPosition(new THREE.Vector3());
-
-				Utils.moveTo(this.viewer.scene, newCamPos, newCamTarget);
-			});
-
-			pickSphere.addEventListener("mouseover", e => {
-				//box.setOpacity(1);
-			});
-
-			pickSphere.addEventListener("mouseleave", e => {
-				//box.setOpacity(0.4);
-			});
-		}
-	}
-
 	initializeTranslationHandles(){
 		let boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -312,7 +176,7 @@ export class TransformationTool {
 				transparent: true});
 
 			let outlineMaterial = new THREE.MeshBasicMaterial({
-				color: 0x000000, 
+				color: 0x000000,
 				side: THREE.BackSide,
 				opacity: 0.4,
 				transparent: true});
@@ -362,159 +226,11 @@ export class TransformationTool {
 		}
 	}
 
-	initializeRotationHandles(){
-		let adjust = 0.5;
-		let torusGeometry = new THREE.TorusGeometry(1, adjust * 0.015, 8, 64, Math.PI / 2);
-		let outlineGeometry = new THREE.TorusGeometry(1, adjust * 0.04, 8, 64, Math.PI / 2);
-		let pickGeometry = new THREE.TorusGeometry(1, adjust * 0.1, 6, 4, Math.PI / 2);
-
-		for(let handleName of Object.keys(this.rotationHandles)){
-			let handle = this.handles[handleName];
-			let node = handle.node;
-			this.scene.add(node);
-
-			let material = new THREE.MeshBasicMaterial({
-				color: handle.color,
-				opacity: 0.4,
-				transparent: true});
-
-			let outlineMaterial = new THREE.MeshBasicMaterial({
-				color: 0x000000, 
-				side: THREE.BackSide,
-				opacity: 0.4,
-				transparent: true});
-
-			let pickMaterial = new THREE.MeshNormalMaterial({
-				opacity: 0.2,
-				transparent: true,
-				visible: this.showPickVolumes
-			});
-
-			let box = new THREE.Mesh(torusGeometry, material);
-			box.name = `${handleName}.handle`;
-			box.scale.set(20, 20, 20);
-			box.lookAt(new THREE.Vector3(...handle.alignment));
-			node.add(box);
-			handle.translateNode = box;
-
-			let outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
-			outline.name = `${handleName}.outline`;
-			outline.scale.set(1, 1, 1);
-			outline.renderOrder = 0;
-			box.add(outline);
-
-			let pickVolume = new THREE.Mesh(pickGeometry, pickMaterial);
-			pickVolume.name = `${handleName}.pick_volume`;
-			pickVolume.scale.set(1, 1, 1);
-			pickVolume.handle = handleName;
-			box.add(pickVolume);
-			this.pickVolumes.push(pickVolume);
-
-			node.setOpacity = (target) => {
-				let opacity = {x: material.opacity};
-				let t = new TWEEN.Tween(opacity).to({x: target}, 100);
-				t.onUpdate(() => {
-					box.visible = opacity.x > 0;
-					pickVolume.visible = opacity.x > 0;
-					material.opacity = opacity.x;
-					outlineMaterial.opacity = opacity.x;
-					pickMaterial.opacity = opacity.x * 0.5;
-				});
-				t.start();
-			};
-
-
-			//pickVolume.addEventListener("mouseover", (e) => {
-			//	//let a = this.viewer.scene.getActiveCamera().getWorldDirection(new THREE.Vector3()).dot(pickVolume.getWorldDirection(new THREE.Vector3()));
-			//	console.log(pickVolume.getWorldDirection(new THREE.Vector3()));
-			//});
-			
-			pickVolume.addEventListener("drag", (e) => {this.dragRotationHandle(e)});
-			pickVolume.addEventListener("drop", (e) => {this.dropRotationHandle(e)});
-		}
-	}
-
-	dragRotationHandle(e){
-		let drag = e.drag;
-		let handle = this.activeHandle;
-		let camera = this.viewer.scene.getActiveCamera();
-
-		if(!handle){
-			return
-		};
-
-		let localNormal = new THREE.Vector3(...handle.alignment);
-		let n = new THREE.Vector3();
-		n.copy(new THREE.Vector4(...localNormal.toArray(), 0).applyMatrix4(handle.node.matrixWorld));
-		n.normalize();
-
-		if (!drag.intersectionStart){
-
-			//this.viewer.scene.scene.remove(this.debug);
-			//this.debug = new THREE.Object3D();
-			//this.viewer.scene.scene.add(this.debug);
-			//Utils.debugSphere(this.debug, drag.location, 3, 0xaaaaaa);
-			//let debugEnd = drag.location.clone().add(n.clone().multiplyScalar(20));
-			//Utils.debugLine(this.debug, drag.location, debugEnd, 0xff0000);
-
-			drag.intersectionStart = drag.location;
-			drag.objectStart = drag.object.getWorldPosition(new THREE.Vector3());
-			drag.handle = handle;
-
-			let plane = new THREE.Plane().setFromNormalAndCoplanarPoint(n, drag.intersectionStart);
-
-			drag.dragPlane = plane;
-			drag.pivot = drag.intersectionStart;
-		}else{
-			handle = drag.handle;
-		}
-
-		this.dragging = true;
-
-		let mouse = drag.end;
-		let domElement = this.viewer.renderer.domElement;
-		let ray = Utils.mouseToRay(mouse, camera, domElement.clientWidth, domElement.clientHeight);
-		
-		let I = ray.intersectPlane(drag.dragPlane, new THREE.Vector3());
-
-		if (I) {
-			let center = this.scene.getWorldPosition(new THREE.Vector3());
-			let from = drag.pivot;
-			let to = I;
-
-			let v1 = from.clone().sub(center).normalize();
-			let v2 = to.clone().sub(center).normalize();
-
-			let angle = Math.acos(v1.dot(v2));
-			let sign = Math.sign(v1.cross(v2).dot(n));
-			angle = angle * sign;
-			if (Number.isNaN(angle)) {
-				return;
-			}
-
-			let normal = new THREE.Vector3(...handle.alignment);
-			for (let selection of this.selection) {
-				selection.rotateOnAxis(normal, angle);
-				selection.dispatchEvent({
-					type: "orientation_changed",
-					object: selection
-				});
-			}
-
-			drag.pivot = I;
-		}
-	}
-
-	dropRotationHandle(e){
-		this.dragging = false;
-		this.setActiveHandle(null);
-	}
-
 	dragTranslationHandle(e){
 		let drag = e.drag;
 		let handle = this.activeHandle;
 		let camera = this.viewer.scene.getActiveCamera();
-			
+
 		if(!drag.intersectionStart && handle){
 			drag.intersectionStart = drag.location;
 			drag.objectStart = drag.object.getWorldPosition(new THREE.Vector3());
@@ -663,15 +379,6 @@ export class TransformationTool {
 			}
 		}
 
-		for(let handleName of Object.keys(this.focusHandles)){
-			let handle = this.focusHandles[handleName];
-
-			if(this.activeHandle === handle){
-				handle.node.setOpacity(1.0);
-			}else{
-				handle.node.setOpacity(0.4)
-			}
-		}
 
 		for(let handleName of Object.keys(this.translationHandles)){
 			let handle = this.translationHandles[handleName];
@@ -683,27 +390,11 @@ export class TransformationTool {
 			}
 		}
 
-		for(let handleName of Object.keys(this.rotationHandles)){
-			let handle = this.rotationHandles[handleName];
-
-			//if(this.activeHandle === handle){
-			//	handle.node.setOpacity(1.0);
-			//}else{
-			//	handle.node.setOpacity(0.4)
-			//}
-
-			handle.node.setOpacity(0.4);
-		}
-
 		for(let handleName of Object.keys(this.scaleHandles)){
 			let handle = this.scaleHandles[handleName];
 
 			if(this.activeHandle === handle){
 				handle.node.setOpacity(1.0);
-
-				let relatedFocusHandle = this.focusHandles[handle.name.replace("scale", "focus")];
-				let relatedFocusNode = relatedFocusHandle.node;
-				relatedFocusNode.setOpacity(0.4);
 
 				for(let translationHandleName of Object.keys(this.translationHandles)){
 					let translationHandle = this.translationHandles[translationHandleName];
@@ -721,7 +412,7 @@ export class TransformationTool {
 			}
 		}
 
-		
+
 
 
 
@@ -729,7 +420,7 @@ export class TransformationTool {
 			handle.node.setOpacity(1.0);
 		}
 
-		
+
 	}
 
 	update () {
@@ -751,7 +442,6 @@ export class TransformationTool {
 
 			this.scene.scale.copy(selected.boundingBox.getSize(new THREE.Vector3()).multiply(selected.scale));
 			this.scene.position.copy(center);
-			this.scene.rotation.copy(selected.rotation);
 
 			this.scene.updateMatrixWorld();
 
@@ -781,62 +471,6 @@ export class TransformationTool {
 					node.scale.copy(scale);
 				}
 
-				// adjust rotation handles
-				if(!this.dragging){
-					let tWorld = this.scene.matrixWorld;
-					let tObject = new THREE.Matrix4().getInverse(tWorld)
-					let camObjectPos = camera.getWorldPosition(new THREE.Vector3()).applyMatrix4(tObject);
-
-					let x = this.rotationHandles["rotation.x"].node.rotation;
-					let y = this.rotationHandles["rotation.y"].node.rotation;
-					let z = this.rotationHandles["rotation.z"].node.rotation;
-
-					x.order = "ZYX";
-					y.order = "ZYX";
-
-					let above = camObjectPos.z > 0;
-					let below = !above;
-					let PI_HALF = Math.PI / 2;
-
-					if(above){
-						if(camObjectPos.x > 0 && camObjectPos.y > 0){
-							x.x = 1 * PI_HALF;
-							y.y = 3 * PI_HALF;
-							z.z = 0 * PI_HALF;
-						}else if(camObjectPos.x < 0 && camObjectPos.y > 0){
-							x.x = 1 * PI_HALF;
-							y.y = 2 * PI_HALF;
-							z.z = 1 * PI_HALF;
-						}else if(camObjectPos.x < 0 && camObjectPos.y < 0){
-							x.x = 2 * PI_HALF;
-							y.y = 2 * PI_HALF;
-							z.z = 2 * PI_HALF;
-						}else if(camObjectPos.x > 0 && camObjectPos.y < 0){
-							x.x = 2 * PI_HALF;
-							y.y = 3 * PI_HALF;
-							z.z = 3 * PI_HALF;
-						}
-					}else if(below){
-						if(camObjectPos.x > 0 && camObjectPos.y > 0){
-							x.x = 0 * PI_HALF;
-							y.y = 0 * PI_HALF;
-							z.z = 0 * PI_HALF;
-						}else if(camObjectPos.x < 0 && camObjectPos.y > 0){
-							x.x = 0 * PI_HALF;
-							y.y = 1 * PI_HALF;
-							z.z = 1 * PI_HALF;
-						}else if(camObjectPos.x < 0 && camObjectPos.y < 0){
-							x.x = 3 * PI_HALF;
-							y.y = 1 * PI_HALF;
-							z.z = 2 * PI_HALF;
-						}else if(camObjectPos.x > 0 && camObjectPos.y < 0){
-							x.x = 3 * PI_HALF;
-							y.y = 0 * PI_HALF;
-							z.z = 3 * PI_HALF;
-						}
-					}
-				}
-
 				{
 					let ray = Utils.mouseToRay(mouse, camera, domElement.clientWidth, domElement.clientHeight);
 					let raycaster = new THREE.Raycaster(ray.origin, ray.direction);
@@ -851,13 +485,13 @@ export class TransformationTool {
 					}
 				}
 
-				// 
+				//
 				for(let handleName of Object.keys(this.scaleHandles)){
 					let handle = this.handles[handleName];
 					let node = handle.node;
 					let alignment = handle.alignment;
 
-					
+
 
 				}
 			}
@@ -882,7 +516,8 @@ export class TransformationTool {
 		}else{
 			this.scene.visible = false;
 		}
-		
+
 	}
 
 };
+
