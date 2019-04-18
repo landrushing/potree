@@ -56,7 +56,7 @@ export function updateVisibilityStructures(pointclouds, camera, renderer) {
 		let frustum = new THREE.Frustum();
 		let viewI = camera.matrixWorldInverse;
 		let world = pointcloud.matrixWorld;
-		
+
 		// use close near plane for frustum intersection
 		let frustumCam = camera.clone();
 		frustumCam.near = Math.min(camera.near, 0.1);
@@ -119,7 +119,7 @@ export function updateVisibility(pointclouds, camera, renderer){
 	let priorityQueue = s.priorityQueue;
 
 	let loadedToGPUThisFrame = 0;
-	
+
 	let domWidth = renderer.domElement.clientWidth;
 	let domHeight = renderer.domElement.clientHeight;
 
@@ -179,14 +179,6 @@ export function updateVisibility(pointclouds, camera, renderer){
 		visible = visible && !(numVisiblePointsInPointclouds.get(pointcloud) + node.getNumPoints() > pointcloud.pointBudget);
 		visible = visible && level < maxLevel;
 		//visible = visible && node.name !== "r613";
-
-		
-
-
-		if(!window.warned125){
-			console.log("TODO");
-			window.warned125 = true;
-		}
 
 		let clipBoxes = pointcloud.material.clipBoxes;
 		if(true && clipBoxes.length > 0){
@@ -273,7 +265,7 @@ export function updateVisibility(pointclouds, camera, renderer){
 				//	visible = false;
 				//}
 			}
-			
+
 
 		}
 
@@ -327,7 +319,7 @@ export function updateVisibility(pointclouds, camera, renderer){
 			let transformVersion = pointcloudTransformVersion.get(pointcloud);
 			if(node._transformVersion !== transformVersion.number){
 				node.sceneNode.updateMatrix();
-				node.sceneNode.matrixWorld.multiplyMatrices(pointcloud.matrixWorld, node.sceneNode.matrix);	
+				node.sceneNode.matrixWorld.multiplyMatrices(pointcloud.matrixWorld, node.sceneNode.matrix);
 				node._transformVersion = transformVersion.number;
 			}
 
@@ -350,31 +342,31 @@ export function updateVisibility(pointclouds, camera, renderer){
 		for (let i = 0; i < children.length; i++) {
 			let child = children[i];
 
-			let weight = 0; 
+			let weight = 0;
 			if(camera.isPerspectiveCamera){
 				let sphere = child.getBoundingSphere();
 				let center = sphere.center;
 				//let distance = sphere.center.distanceTo(camObjPos);
-				
+
 				let dx = camObjPos.x - center.x;
 				let dy = camObjPos.y - center.y;
 				let dz = camObjPos.z - center.z;
-				
+
 				let dd = dx * dx + dy * dy + dz * dz;
 				let distance = Math.sqrt(dd);
-				
-				
+
+
 				let radius = sphere.radius;
-				
+
 				let fov = (camera.fov * Math.PI) / 180;
 				let slope = Math.tan(fov / 2);
 				let projFactor = (0.5 * domHeight) / (slope * distance);
 				let screenPixelRadius = radius * projFactor;
-				
+
 				if(screenPixelRadius < pointcloud.minimumNodePixelSize){
 					continue;
 				}
-			
+
 				weight = screenPixelRadius;
 
 				if(distance - radius < 0){
@@ -382,7 +374,7 @@ export function updateVisibility(pointclouds, camera, renderer){
 				}
 			} else {
 				// TODO ortho visibility
-				let bb = child.getBoundingBox();				
+				let bb = child.getBoundingBox();
 				let distance = child.getBoundingSphere().center.distanceTo(camObjPos);
 				let diagonal = bb.max.clone().sub(bb.min).length();
 				//weight = diagonal / distance;
