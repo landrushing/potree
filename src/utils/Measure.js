@@ -20,7 +20,7 @@ export class Measure extends THREE.Object3D {
 		this.maxMarkers = Number.MAX_SAFE_INTEGER;
 
 		this.sphereGeometry = new THREE.SphereGeometry(0.4, 10, 10);
-		this.color = new THREE.Color(0xff0000);
+		this.color = new THREE.Color(0xf5751c);
 
 		this.lengthUnit = {code: 'm'};
 
@@ -149,9 +149,9 @@ export class Measure extends THREE.Object3D {
 		{ // Event Listeners
 			let drag = (e) => {
 				let I = Utils.getMousePointCloudIntersection(
-					e.drag.end, 
-					e.viewer.scene.getActiveCamera(), 
-					e.viewer, 
+					e.drag.end,
+					e.viewer.scene.getActiveCamera(),
+					e.viewer,
 					e.viewer.scene.pointclouds,
 					{pickClipped: true});
 
@@ -315,7 +315,7 @@ export class Measure extends THREE.Object3D {
 
 			{ // coordinate labels
 				let coordinateLabel = this.coordinateLabels[0];
-				
+
 				let msg = position.toArray().map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
 				coordinateLabel.setText(msg);
 

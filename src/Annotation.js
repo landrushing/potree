@@ -136,7 +136,7 @@ export class Annotation extends EventDispatcher {
 				</svg>
 			</div>
 		`);
-		
+
 		let svg = domElement.find("svg")[0];
 		let elLine = domElement.find("line")[0];
 		let elStart = domElement.find("circle")[0];
@@ -196,7 +196,7 @@ export class Annotation extends EventDispatcher {
 				let renderAreaHeight = viewer.renderer.getSize().height;
 
 				let diff = {
-					x: ui.originalPosition.left - ui.position.left, 
+					x: ui.originalPosition.left - ui.position.left,
 					y: ui.originalPosition.top - ui.position.top
 				};
 
@@ -248,7 +248,7 @@ export class Annotation extends EventDispatcher {
 
 				return screenPos;
 			};
-			
+
 			start = toScreen(start);
 			end = toScreen(end);
 
@@ -531,31 +531,6 @@ export class Annotation extends EventDispatcher {
 
 			Utils.moveTo(this.scene, endPosition, endTarget);
 
-			//{ // animate camera position
-			//	let tween = new TWEEN.Tween(view.position).to(endPosition, animationDuration);
-			//	tween.easing(easing);
-			//	tween.start();
-			//}
-
-			//{ // animate camera target
-			//	let camTargetDistance = camera.position.distanceTo(endTarget);
-			//	let target = new THREE.Vector3().addVectors(
-			//		camera.position,
-			//		camera.getWorldDirection().clone().multiplyScalar(camTargetDistance)
-			//	);
-			//	let tween = new TWEEN.Tween(target).to(endTarget, animationDuration);
-			//	tween.easing(easing);
-			//	tween.onUpdate(() => {
-			//		view.lookAt(target);
-			//	});
-			//	tween.onComplete(() => {
-			//		view.lookAt(target);
-			//		this.dispatchEvent({type: 'focusing_finished', target: this});
-			//	});
-
-			//	this.dispatchEvent({type: 'focusing_started', target: this});
-			//	tween.start();
-			//}
 		} else if (this.radius) {
 			let direction = view.direction;
 			let endPosition = endTarget.clone().add(direction.multiplyScalar(-this.radius));
